@@ -1,0 +1,19 @@
+Package: vasicekfit
+Title: Extended Vasicek Credit Loss Model with Macroeconomic Factors
+Version: 0.1.0
+Authors@R: person("Dmitriy", "Mayorov", email = "rpubs@dimview.org",
+                  role = c("aut", "cre"))
+Description: Fits the extended Vasicek single-factor credit loss model where the
+    probability of default depends on macroeconomic covariates. Maximum likelihood
+    estimates of all parameters, including asset value correlation, are obtained
+    via closed-form probit-transformed OLS regression. Provides density, distribution,
+    quantile, and random generation functions for the Vasicek loss distribution.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Depends: R (>= 3.5.0)
+Imports: stats
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://rpubs.com/arququ/1416521

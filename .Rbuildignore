@@ -1,0 +1,5 @@
+^LICENSE\.md$
+^\.Rbuildignore$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.claude$
