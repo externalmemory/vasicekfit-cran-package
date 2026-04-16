@@ -10,6 +10,9 @@ S3method(coef, vasicekfit)
 S3method(fitted, vasicekfit)
 S3method(residuals, vasicekfit)
 S3method(predict, vasicekfit)
+S3method(vcov, vasicekfit)
+S3method(confint, vasicekfit)
 
-importFrom(stats, coef, delete.response, lm, model.frame, model.matrix,
-           model.response, pnorm, qnorm, rnorm, terms, var)
+importFrom(stats, coef, confint, delete.response, dnorm, lm, model.frame,
+           model.matrix, model.response, pnorm, printCoefmat, qnorm, rnorm,
+           terms, var, vcov)

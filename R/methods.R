@@ -17,15 +17,23 @@ summary.vasicekfit <- function(object, ...) {
   cat("\nCall:\n")
   print(object$call)
 
-  cat("\nVasicek model parameters:\n")
-  cat("  p (PD)    =", format(object$p, digits = 6), "\n")
-  cat("  rho (AVC) =", format(object$rho, digits = 6), "\n")
-  cat("  sigma2    =", format(object$sigma2, digits = 6), "\n")
-  if (length(object$kappa) > 0) {
-    cat("\n  Macro-factor sensitivities (kappa):\n")
-    print(object$kappa, digits = 6)
-  }
-  cat("\nBias correction:", object$bias_correct, "\n")
+  V <- stats::vcov(object)
+  cf <- stats::coef(object)
+  ses <- sqrt(diag(V))
+  zval <- cf / ses
+  pval <- 2 * stats::pnorm(-abs(zval))
+  ctab <- cbind(
+    Estimate    = cf,
+    `Std. Error` = ses,
+    `z value`   = zval,
+    `Pr(>|z|)`  = pval
+  )
+
+  cat("\nCoefficients (original-space parameters):\n")
+  stats::printCoefmat(ctab, has.Pvalue = TRUE)
+
+  cat("\nsigma2 =", format(object$sigma2, digits = 6), "\n")
+  cat("Bias correction:", object$bias_correct, "\n")
   if (!is.null(object$portfolio_size)) {
     cat("Portfolio size:", object$portfolio_size, "\n")
   }
@@ -34,6 +42,68 @@ summary.vasicekfit <- function(object, ...) {
   print(summary(object$lm_fit))
 
   invisible(object)
+}
+
+#' @export
+vcov.vasicekfit <- function(object, ...) {
+  beta_hat <- stats::coef(object$lm_fit)
+  sigma2   <- object$sigma2
+  s        <- sqrt(1 + sigma2)
+  N        <- length(object$residuals)
+  k        <- length(beta_hat)
+  m        <- k - 1L
+
+  Vbeta <- stats::vcov(object$lm_fit)
+
+  if (isTRUE(object$bias_correct)) {
+    var_sigma2 <- 2 * sigma2^2 / (N - m - 1L)
+  } else {
+    var_sigma2 <- 2 * sigma2^2 * (N - m - 1L) / N^2
+  }
+
+  V <- matrix(0, k + 1L, k + 1L)
+  V[seq_len(k), seq_len(k)] <- Vbeta
+  V[k + 1L, k + 1L] <- var_sigma2
+
+  beta0  <- beta_hat[1L]
+  phi_b0 <- stats::dnorm(beta0 / s)
+
+  J <- matrix(0, k + 1L, k + 1L)
+  J[1L, 1L]      <- phi_b0 / s
+  J[1L, k + 1L] <- -phi_b0 * beta0 / (2 * s^3)
+  J[2L, k + 1L] <- 1 / (1 + sigma2)^2
+  if (m > 0L) {
+    for (j in seq_len(m)) {
+      J[2L + j, 1L + j]  <- 1 / s
+      J[2L + j, k + 1L] <- -beta_hat[1L + j] / (2 * s^3)
+    }
+  }
+
+  out <- J %*% V %*% t(J)
+  nms <- c("p", "rho", names(object$kappa))
+  dimnames(out) <- list(nms, nms)
+  out
+}
+
+#' @export
+confint.vasicekfit <- function(object, parm, level = 0.95, ...) {
+  cf  <- stats::coef(object)
+  ses <- sqrt(diag(stats::vcov(object)))
+  pnms <- names(cf)
+
+  if (missing(parm)) {
+    parm <- pnms
+  } else if (is.numeric(parm)) {
+    parm <- pnms[parm]
+  }
+
+  a <- (1 - level) / 2
+  z <- stats::qnorm(1 - a)
+
+  ci <- cbind(cf[parm] - z * ses[parm], cf[parm] + z * ses[parm])
+  colnames(ci) <- sprintf("%.1f %%", 100 * c(a, 1 - a))
+  rownames(ci) <- parm
+  ci
 }
 
 #' @export
