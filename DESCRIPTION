@@ -14,6 +14,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: R (>= 3.5.0)
 Imports: stats
-Suggests: testthat (>= 3.0.0)
+Suggests: testthat (>= 3.0.0), vasicek
 Config/testthat/edition: 3
 URL: https://rpubs.com/arququ/1416521

@@ -82,6 +82,20 @@ test_that("fitted and residuals are in probit space", {
   expect_equal(unname(fitted(fit) + residuals(fit)), qnorm(x))
 })
 
+test_that("intercept-only fit matches vasicek::vsk_imm", {
+  skip_if_not_installed("vasicek")
+
+  set.seed(42)
+  x <- vasicek::vsk_rvs(500, Rho = 0.1, P = 0.03)
+  d <- data.frame(delq_rate = x)
+
+  ref <- vasicek::vsk_imm(d$delq_rate)
+  fit <- vasicekfit(delq_rate ~ 1, data = d)
+
+  expect_equal(fit$p,   ref$P,   tolerance = 1e-12)
+  expect_equal(fit$rho, ref$Rho, tolerance = 1e-12)
+})
+
 test_that("portfolio_size correction works", {
   set.seed(3)
   n <- 100
