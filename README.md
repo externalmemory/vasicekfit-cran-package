@@ -10,34 +10,38 @@ closed form via probit-transformed OLS.
 From CRAN (once published):
 
 ```r
-    install.packages("vasicekfit")
+install.packages("vasicekfit")
+```
 
 Development version from GitHub:
 
-    # install.packages("remotes")
-    remotes::install_github("externalmemory/vasicekfit-cran-package")
+```r
+# install.packages("remotes")
+remotes::install_github("externalmemory/vasicekfit-cran-package")
+```
 
 ## Example
 
-    library(vasicekfit)
+```r
+library(vasicekfit)
 
-    set.seed(1)
-    n <- 500
+set.seed(1)
+n <- 500
 
-    unemp <- rnorm(n)
-    hpi   <- rnorm(n)
-    z     <- rnorm(n)
+unemp <- rnorm(n)
+hpi   <- rnorm(n)
+z     <- rnorm(n)
 
-    y <- pnorm((qnorm(0.03) + 0.13 * unemp - 0.07 * hpi + sqrt(0.05) * z) / sqrt(0.95))
-    d <- data.frame(default_rate = y, unemp = unemp, hpi = hpi)
+y <- pnorm((qnorm(0.03) + 0.13 * unemp - 0.07 * hpi + sqrt(0.05) * z) / sqrt(0.95))
+d <- data.frame(default_rate = y, unemp = unemp, hpi = hpi)
 
-    fit <- vasicekfit(default_rate ~ unemp + hpi, data = d)
+fit <- vasicekfit(default_rate ~ unemp + hpi, data = d)
 
-    coef(fit)
-    confint(fit)
+coef(fit)
+confint(fit)
+```
 
-summary(fit) prints a coefficient table with delta-method standard
-errors, z-values, and p-values for the recovered parameters (p, rho, kappa).
+<code>summary(fit)<code> prints a coefficient table with delta-method standard errors, z-values, and p-values for the recovered parameters (p, rho, kappa).
 
 ## References
 
