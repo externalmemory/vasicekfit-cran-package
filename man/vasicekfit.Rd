@@ -15,7 +15,8 @@ vasicekfit(formula, data, bias_correct = FALSE, portfolio_size = NULL)
     response is an observed default/loss rate in (0, 1).}
   \item{data}{a data frame containing the variables in \code{formula}.}
   \item{bias_correct}{logical; if \code{TRUE}, apply the small-sample bias
-    correction to the variance estimate by multiplying by \eqn{N/(N - m - 1)}.}
+    correction to the variance estimate by multiplying by \eqn{N/(N - m - 1)}, 
+    where \eqn{N} is number of observations and \eqn{m} is number of predictors.}
   \item{portfolio_size}{optional positive integer. If supplied, a
     finite-portfolio variance correction is applied to the response before
     fitting (see Yang, 2014, section 4.3).}

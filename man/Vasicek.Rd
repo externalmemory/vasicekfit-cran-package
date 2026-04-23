@@ -32,12 +32,10 @@ rvasicek(n, p, rho, kappa = NULL, u = NULL)
 The Vasicek loss distribution arises from the single-factor Gaussian copula
 model. Its probability density function is
 
-\deqn{f(x) = \sqrt{\frac{1-\rho}{\rho}} \exp\left\{\frac{1}{2}\left(\Phi^{-1}(x)^2 - \left[\frac{\sqrt{1-\rho}\,\Phi^{-1}(x) - \mu}{\sqrt{\rho}}\right]^2\right)\right\}}{f(x) = sqrt((1-rho)/rho) * exp(0.5 * (qnorm(x)^2 - ((sqrt(1-rho)*qnorm(x) - mu)/sqrt(rho))^2))}
-
-where \eqn{\mu = \Phi^{-1}(p) + \sum \kappa_j u_j}{mu = qnorm(p) + sum(kappa * u)}.
+\deqn{f(x) = \sqrt{\frac{1-\rho}{\rho}} \exp\left\{\frac{1}{2}\left(\Phi^{-1}(x)^2 - \left[\frac{\sqrt{1-\rho}\,\Phi^{-1}(x) - \sum \kappa_j u_j - \Phi^{-1}(p)}{\sqrt{\rho}}\right]^2\right)\right\}}{f(x) = sqrt((1-rho)/rho) * exp(0.5 * (qnorm(x)^2 - ((sqrt(1-rho)*qnorm(x) - sum(kappa * u) - qnorm(p))/sqrt(rho))^2))}
 
 When \code{kappa} and \code{u} are \code{NULL}, this reduces to the standard
-two-parameter Vasicek distribution with \eqn{\mu = \Phi^{-1}(p)}{mu = qnorm(p)}.
+two-parameter Vasicek distribution.
 }
 \value{
 \code{dvasicek} gives the density, \code{pvasicek} gives the distribution

@@ -1,7 +1,7 @@
 Package: vasicekfit
 Title: Extended Vasicek Credit Loss Model with Macroeconomic Factors
 Version: 0.1.0
-Authors@R: person("Dmitriy", "Mayorov", email = "rpubs@dimview.org",
+Authors@R: person("Dmitriy", "Mayorov", email = "cran@dimview.org",
                   role = c("aut", "cre"))
 Description: Fits the extended Vasicek single-factor credit loss model where the
     probability of default depends on macroeconomic covariates. Maximum likelihood
@@ -16,4 +16,4 @@ Depends: R (>= 3.5.0)
 Imports: stats
 Suggests: testthat (>= 3.0.0), vasicek
 Config/testthat/edition: 3
-URL: https://rpubs.com/arququ/1416521
+URL: https://ssrn.com/abstract=6506378
