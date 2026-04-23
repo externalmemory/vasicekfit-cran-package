@@ -22,6 +22,12 @@ summary.vasicekfit <- function(object, ...) {
   ses <- sqrt(diag(V))
   zval <- cf / ses
   pval <- 2 * stats::pnorm(-abs(zval))
+
+  # H0: param = 0 is unreachable for p and rho (both strictly positive by
+  # construction), so the Wald z / p-value are not interpretable there.
+  zval[c("p", "rho")] <- NA_real_
+  pval[c("p", "rho")] <- NA_real_
+
   ctab <- cbind(
     Estimate    = cf,
     `Std. Error` = ses,
@@ -30,7 +36,7 @@ summary.vasicekfit <- function(object, ...) {
   )
 
   cat("\nCoefficients (original-space parameters):\n")
-  stats::printCoefmat(ctab, has.Pvalue = TRUE)
+  stats::printCoefmat(ctab, has.Pvalue = TRUE, na.print = "")
 
   cat("\nsigma2 =", format(object$sigma2, digits = 6), "\n")
   cat("Bias correction:", object$bias_correct, "\n")
