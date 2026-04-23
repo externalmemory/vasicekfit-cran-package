@@ -37,11 +37,10 @@ d <- data.frame(default_rate = y, unemp = unemp, hpi = hpi)
 
 fit <- vasicekfit(default_rate ~ unemp + hpi, data = d)
 
+summary(fit)
 coef(fit)
 confint(fit)
 ```
-
-<code>summary(fit)<code> prints a coefficient table with delta-method standard errors, z-values, and p-values for the recovered parameters (p, rho, kappa).
 
 ## References
 
