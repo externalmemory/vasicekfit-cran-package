@@ -16,4 +16,4 @@ Depends: R (>= 3.5.0)
 Imports: stats
 Suggests: testthat (>= 3.0.0), vasicek
 Config/testthat/edition: 3
-URL: https://ssrn.com/abstract=6506378
+URL: https://www.ssrn.com/abstract=6506378
