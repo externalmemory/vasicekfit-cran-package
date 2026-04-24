@@ -1,5 +1,9 @@
 # vasicekfit
 
+  <!-- badges: start -->
+  [![R-CMD-check](https://github.com/externalmemory/vasicekfit-cran-package/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/externalmemory/vasicekfit-cran-package/actions/workflows/R-CMD-check.yaml)
+  <!-- badges: end -->
+
 An R package implementing the extended Vasicek single-factor credit loss
 model, where the probability of default depends on macroeconomic covariates.
 All parameters, including the asset value correlation, are estimated in
