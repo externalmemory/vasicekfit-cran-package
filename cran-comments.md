@@ -1,7 +1,7 @@
 ## Test environments
 
 * local Linux (Rocky 9.7), R 4.5.3
-* win-builder (devel)
+* R-hub (Windows, R-devel) via GitHub Actions
 
 ## R CMD check results
 
