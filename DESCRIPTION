@@ -1,6 +1,6 @@
 Package: vasicekfit
 Title: Extended Vasicek Credit Loss Model with Macroeconomic Factors
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R: person("Dmitriy", "Mayorov", email = "cran@dimview.org",
                   role = c("aut", "cre"))
 Description: Fits the extended Vasicek single-factor credit loss model where
@@ -14,7 +14,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: R (>= 3.5.0)
 Imports: stats
-Suggests: testthat (>= 3.0.0), vasicek
+Suggests: testthat (>= 3.0.0), vasicek, sandwich
 Config/testthat/edition: 3
 URL: https://github.com/externalmemory/vasicekfit-cran-package
 BugReports: https://github.com/externalmemory/vasicekfit-cran-package/issues

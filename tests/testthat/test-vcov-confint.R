@@ -85,6 +85,84 @@ test_that("SEs scale roughly as 1/sqrt(N)", {
   expect_true(all(ratio > 1.5 & ratio < 2.5))
 })
 
+test_that("vcov(type = \"HAC\") returns symmetric PSD matrix with correct names", {
+  skip_if_not_installed("sandwich")
+  set.seed(7)
+  n <- 300
+  u1 <- rnorm(n); u2 <- rnorm(n); z <- rnorm(n)
+  y <- pnorm((qnorm(0.03) + 0.1 * u1 - 0.05 * u2 + sqrt(0.02) * z) / sqrt(0.98))
+  fit <- vasicekfit(y ~ u1 + u2, data = data.frame(y = y, u1 = u1, u2 = u2))
+
+  V <- vcov(fit, type = "HAC")
+  expect_equal(dim(V), c(4L, 4L))
+  expect_equal(rownames(V), c("p", "rho", "u1", "u2"))
+  expect_equal(V, t(V))
+  eig <- eigen(V, symmetric = TRUE, only.values = TRUE)$values
+  expect_true(all(eig >= -1e-8))
+})
+
+test_that("HAC CI coverage beats iid coverage under serial correlation", {
+  skip_on_cran()
+  skip_if_not_installed("sandwich")
+
+  set.seed(20260428)
+  B          <- 300
+  N          <- 200
+  phi_u      <- 0.9
+  phi_e      <- 0.5
+  p_true     <- 0.03
+  rho_true   <- 0.05
+  kappa_true <- 0.13
+
+  ar1 <- function(N, phi, sd = sqrt(1 - phi^2)) {
+    e <- rnorm(N, sd = sd); x <- numeric(N); x[1] <- rnorm(1)
+    for (i in 2:N) x[i] <- phi * x[i - 1] + e[i]
+    x
+  }
+
+  cov_iid <- cov_hac <- matrix(FALSE, B, 3L,
+                               dimnames = list(NULL, c("p", "rho", "u")))
+  for (b in seq_len(B)) {
+    u   <- ar1(N, phi_u)
+    eps <- ar1(N, phi_e) * sqrt(rho_true / (1 - rho_true))
+    Y   <- (qnorm(p_true) + kappa_true * u) / sqrt(1 - rho_true) + eps
+    d   <- data.frame(y = pnorm(Y), u = u)
+    fit <- vasicekfit(y ~ u, data = d)
+
+    ci_i <- confint(fit, type = "iid")
+    ci_h <- confint(fit, type = "HAC")
+    truth <- c(p = p_true, rho = rho_true, u = kappa_true)
+    for (k in seq_along(truth)) {
+      cov_iid[b, k] <- ci_i[k, 1] <= truth[k] && truth[k] <= ci_i[k, 2]
+      cov_hac[b, k] <- ci_h[k, 1] <= truth[k] && truth[k] <= ci_h[k, 2]
+    }
+  }
+
+  rate_iid <- colMeans(cov_iid)
+  rate_hac <- colMeans(cov_hac)
+
+  # iid is badly undercovered under phi_u = 0.9
+  expect_true(all(rate_iid < 0.90))
+  # HAC closes most of the gap
+  expect_true(all(abs(rate_hac - 0.95) < abs(rate_iid - 0.95)))
+  expect_gt(rate_hac["u"] - rate_iid["u"], 0.05)
+})
+
+test_that("confint passes type through to vcov", {
+  skip_if_not_installed("sandwich")
+  fit <- simulate_fit(n = 300, seed = 9)
+  ci_iid <- confint(fit, type = "iid")
+  ci_hac <- confint(fit, type = "HAC")
+  expect_equal(dim(ci_hac), dim(ci_iid))
+  expect_equal(rownames(ci_hac), rownames(ci_iid))
+})
+
+test_that("vcov errors with informative message if sandwich missing", {
+  skip_if(requireNamespace("sandwich", quietly = TRUE))
+  fit <- simulate_fit(n = 100, seed = 10)
+  expect_error(vcov(fit, type = "HAC"), "sandwich")
+})
+
 test_that("Wald CI coverage is approximately nominal under simulation", {
   skip_on_cran()
   set.seed(99)
