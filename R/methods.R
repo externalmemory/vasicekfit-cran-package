@@ -19,7 +19,7 @@ summary.vasicekfit <- function(object, type = c("iid", "HAC"), ...) {
   cat("\nCall:\n")
   print(object$call)
 
-  V <- stats::vcov(object, type = type)
+  V <- stats::vcov(object, type = type, ...)
   cf <- stats::coef(object)
   ses <- sqrt(diag(V))
   zval <- cf / ses
@@ -86,7 +86,7 @@ vcov.vasicekfit <- function(object, type = c("iid", "HAC"), ...) {
     ifx_beta <- (X * e) %*% t(A_inv)
     ifx_sig2 <- e^2 - sigma2
     psi <- cbind(ifx_beta, ifx_sig2)
-    V <- sandwich::lrvar(psi, type = "Newey-West", prewhite = FALSE)
+    V <- sandwich::lrvar(psi, ...)
     V <- (V + t(V)) / 2
   }
 
@@ -115,7 +115,7 @@ confint.vasicekfit <- function(object, parm, level = 0.95,
                                 type = c("iid", "HAC"), ...) {
   type <- match.arg(type)
   cf  <- stats::coef(object)
-  ses <- sqrt(diag(stats::vcov(object, type = type)))
+  ses <- sqrt(diag(stats::vcov(object, type = type, ...)))
   pnms <- names(cf)
 
   if (missing(parm)) {

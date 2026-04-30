@@ -28,10 +28,15 @@ and accessor methods for \code{"vasicekfit"} objects.
     parameters are considered.}
   \item{level}{the confidence level required.}
   \item{type}{covariance type. \code{"iid"} (default) uses the closed-form
-    block-diagonal Gaussian covariance. \code{"HAC"} uses a Newey-West
-    long-run covariance of the joint influence functions for
+    block-diagonal Gaussian covariance. \code{"HAC"} uses a kernel long-run
+    covariance of the joint influence functions for
     \eqn{(\hat\beta, \hat\sigma^2)} and requires the \pkg{sandwich} package.}
-  \item{\dots}{additional arguments (currently unused).}
+  \item{\dots}{when \code{type = "HAC"}, extra arguments are forwarded to
+    \code{\link[sandwich]{lrvar}}, e.g. \code{prewhite}, \code{kernel},
+    \code{bw}, or \code{adjust}. (\code{lrvar}'s own \code{type} argument
+    cannot be set this way because the name collides; if you need
+    Newey-West-style bandwidth selection, pass \code{kernel = "Bartlett"}
+    and an explicit \code{bw}.) Ignored when \code{type = "iid"}.}
 }
 \details{
 \code{coef} returns the recovered Vasicek parameters (p, rho, and kappas)
@@ -52,12 +57,15 @@ under normality. The variance of \eqn{\hat\sigma^2} uses
 when \code{bias_correct = TRUE}.
 
 With \code{type = "HAC"} the joint covariance of
-\eqn{(\hat\beta, \hat\sigma^2)} is estimated as the Newey-West long-run
-variance of the stacked influence functions
+\eqn{(\hat\beta, \hat\sigma^2)} is estimated as the long-run variance of
+the stacked influence functions
 \eqn{\psi_{\beta,i} = (X'X/N)^{-1} x_i e_i} and
-\eqn{\psi_{\sigma^2,i} = e_i^2 - \hat\sigma^2}. This is appropriate when
-the data exhibit serial correlation (e.g. quarterly macro covariates), at
-the cost of some finite-sample bias.
+\eqn{\psi_{\sigma^2,i} = e_i^2 - \hat\sigma^2}, computed via
+\code{\link[sandwich]{lrvar}}. This is appropriate when the data exhibit
+serial correlation (e.g. quarterly macro covariates), at the cost of some
+finite-sample bias. Defaults follow \code{lrvar} (Andrews quadratic-spectral
+kernel, prewhitened); pass \code{prewhite}, \code{kernel}, \code{bw}, or
+\code{adjust} via \code{\dots} to override.
 
 The HAC standard errors do not change with \code{bias_correct}: the
 long-run variance is estimated empirically from the influence functions
