@@ -1,6 +1,7 @@
 # vasicekfit
 
   <!-- badges: start -->
+  [![CRAN status](https://www.r-pkg.org/badges/version/vasicekfit)](https://CRAN.R-project.org/package=vasicekfit)
   [![R-CMD-check](https://github.com/externalmemory/vasicekfit-cran-package/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/externalmemory/vasicekfit-cran-package/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
 
@@ -11,7 +12,7 @@ closed form via probit-transformed OLS.
 
 ## Installation
 
-From CRAN (once published):
+From CRAN:
 
 ```r
 install.packages("vasicekfit")
