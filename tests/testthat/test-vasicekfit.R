@@ -109,3 +109,24 @@ test_that("portfolio_size correction works", {
   # With finite portfolio correction, rho should be slightly different
   expect_false(identical(fit1$rho, fit2$rho))
 })
+
+test_that("portfolio_size correction handles observed zero default rates", {
+  set.seed(99)
+  s <- 200
+  n <- 300
+  pcond <- pnorm((qnorm(0.05) + sqrt(0.08) * rnorm(n)) / sqrt(1 - 0.08))
+  y <- rbinom(n, s, pcond) / s
+  expect_true(any(y == 0)) # the scenario the correction exists for
+
+  fit <- vasicekfit(y ~ 1, data = data.frame(y = y), portfolio_size = s)
+  expect_true(fit$p > 0 && fit$p < 1)
+  expect_true(fit$rho > 0 && fit$rho < 1)
+  expect_lt(abs(fit$p - 0.05), 0.01)
+  expect_lt(abs(fit$rho - 0.08), 0.03)
+})
+
+test_that("no-intercept formulas are rejected", {
+  d <- data.frame(y = c(0.01, 0.02, 0.03), u = 1:3)
+  expect_error(vasicekfit(y ~ u - 1, data = d), "intercept")
+  expect_error(vasicekfit(y ~ u + 0, data = d), "intercept")
+})

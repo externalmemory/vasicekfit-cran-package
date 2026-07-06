@@ -6,13 +6,17 @@
 #' probit-transformed OLS.
 #'
 #' @param formula a formula of the form \code{response ~ predictors} where the
-#'   response is an observed default/loss rate in (0, 1).
+#'   response is an observed default/loss rate in (0, 1) (or [0, 1] when
+#'   \code{portfolio_size} is supplied). The model must include an intercept.
 #' @param data a data frame containing the variables in \code{formula}.
 #' @param bias_correct logical; if \code{TRUE}, apply the small-sample bias
 #'   correction to the variance estimate by multiplying by \eqn{N/(N - m - 1)}.
 #' @param portfolio_size optional positive integer. If supplied, a
 #'   finite-portfolio variance correction is applied to the response before
-#'   fitting (see Yang, 2014, section 4.3).
+#'   fitting (see Yang, 2014, section 4.3). The correction shrinks the
+#'   observed rates towards their mean, mapping rates of exactly 0 or 1 into
+#'   (0, 1), so such observations are permitted when \code{portfolio_size}
+#'   is given.
 #'
 #' @return An object of class \code{"vasicekfit"}, which is a list containing:
 #' \describe{
@@ -64,17 +68,30 @@ vasicekfit <- function(formula, data, bias_correct = FALSE,
   y <- stats::model.response(mf)
   mt <- stats::terms(mf)
 
-  if (!is.numeric(y) || any(y <= 0 | y >= 1)) {
-    stop("response must be numeric with values in (0, 1)")
+  if (attr(mt, "intercept") == 0L) {
+    stop("the model must include an intercept; remove '- 1' or '+ 0' from the formula")
+  }
+
+  if (!is.numeric(y)) {
+    stop("response must be numeric")
   }
 
   if (!is.null(portfolio_size)) {
     if (portfolio_size < 2) stop("portfolio_size must be >= 2")
+    if (any(y < 0 | y > 1)) stop("response must have values in [0, 1]")
     p0 <- mean(y)
     vr <- stats::var(y)
     v0 <- vr - (p0 * (1 - p0) - vr) / (portfolio_size - 1)
     if (v0 <= 0) stop("finite-portfolio correction yielded non-positive variance")
     y <- p0 + (y - p0) * sqrt(v0 / vr)
+  }
+
+  if (any(y <= 0 | y >= 1)) {
+    stop("response must be numeric with values in (0, 1)",
+         if (is.null(portfolio_size))
+           "; observed rates of exactly 0 or 1 can be handled by supplying portfolio_size"
+         else
+           " after the finite-portfolio correction")
   }
 
   Y <- stats::qnorm(y)

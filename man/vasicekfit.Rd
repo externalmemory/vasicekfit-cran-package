@@ -12,14 +12,18 @@ vasicekfit(formula, data, bias_correct = FALSE, portfolio_size = NULL)
 }
 \arguments{
   \item{formula}{a formula of the form \code{response ~ predictors} where the
-    response is an observed default/loss rate in (0, 1).}
+    response is an observed default/loss rate in (0, 1) (or [0, 1] when
+    \code{portfolio_size} is supplied). The model must include an intercept.}
   \item{data}{a data frame containing the variables in \code{formula}.}
   \item{bias_correct}{logical; if \code{TRUE}, apply the small-sample bias
-    correction to the variance estimate by multiplying by \eqn{N/(N - m - 1)}, 
+    correction to the variance estimate by multiplying by \eqn{N/(N - m - 1)},
     where \eqn{N} is number of observations and \eqn{m} is number of predictors.}
   \item{portfolio_size}{optional positive integer. If supplied, a
     finite-portfolio variance correction is applied to the response before
-    fitting (see Yang, 2014, section 4.3).}
+    fitting (see Yang, 2014, section 4.3). The correction shrinks the
+    observed rates towards their mean, mapping rates of exactly 0 or 1 into
+    (0, 1), so such observations are permitted when \code{portfolio_size}
+    is given.}
 }
 \value{
 An object of class \code{"vasicekfit"}, which is a list containing:

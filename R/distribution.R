@@ -57,8 +57,7 @@ dvasicek <- function(x, p, rho, kappa = NULL, u = NULL, log = FALSE) {
   if (rho <= 0 || rho >= 1) stop("rho must be in (0, 1)")
 
   mu <- .vasicek_mu(p, kappa, u)
-  z <- stats::qnorm(x)
-  a <- sqrt((1 - rho) / rho)
+  z <- suppressWarnings(stats::qnorm(x)) # NaN outside (0, 1); overwritten below
   arg <- (sqrt(1 - rho) * z - mu) / sqrt(rho)
 
   log_d <- 0.5 * log((1 - rho) / rho) +
@@ -79,8 +78,9 @@ pvasicek <- function(q, p, rho, kappa = NULL, u = NULL,
 
   mu <- .vasicek_mu(p, kappa, u)
 
+  z <- suppressWarnings(stats::qnorm(q)) # NaN outside (0, 1); overwritten below
   prob <- stats::pnorm(
-    (sqrt(1 - rho) * stats::qnorm(q) - mu) / sqrt(rho)
+    (sqrt(1 - rho) * z - mu) / sqrt(rho)
   )
 
   prob[q <= 0] <- 0

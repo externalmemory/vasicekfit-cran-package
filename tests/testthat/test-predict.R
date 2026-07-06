@@ -9,7 +9,7 @@ test_that("predict link matches fitted values on training data", {
   expect_equal(predict(fit, type = "link"), fitted(fit))
 })
 
-test_that("predict response is pnorm of link", {
+test_that("predict response returns the conditional mean (effective PD)", {
   set.seed(11)
   n <- 100
   u <- rnorm(n)
@@ -17,9 +17,27 @@ test_that("predict response is pnorm of link", {
   d <- data.frame(y = x, u = u)
   fit <- vasicekfit(y ~ u, data = d)
 
-  link <- predict(fit, type = "link")
   resp <- predict(fit, type = "response")
-  expect_equal(resp, pnorm(link))
+  expect_equal(unname(resp), unname(pnorm(qnorm(fit$p) + fit$kappa["u"] * u)))
+
+  # the conditional median is the alpha = 0.5 quantile, which equals
+  # pnorm of the link prediction; for p < 0.5 the mean exceeds it
+  med <- predict(fit, alpha = 0.5, type = "response")
+  expect_equal(unname(med), unname(pnorm(predict(fit, type = "link"))))
+  expect_true(all(resp > med))
+})
+
+test_that("predict response matches Monte Carlo conditional mean", {
+  set.seed(20)
+  n <- 200
+  u <- rnorm(n)
+  x <- pnorm((qnorm(0.03) + 0.15 * u + sqrt(0.05) * rnorm(n)) / sqrt(0.95))
+  fit <- vasicekfit(y ~ u, data = data.frame(y = x, u = u))
+
+  u_new <- 1.5
+  resp <- predict(fit, newdata = data.frame(u = u_new), type = "response")
+  mc <- mean(rvasicek(200000, fit$p, fit$rho, kappa = fit$kappa, u = u_new))
+  expect_equal(unname(resp), mc, tolerance = 0.01)
 })
 
 test_that("predict with newdata works", {
