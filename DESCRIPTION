@@ -1,6 +1,6 @@
 Package: vasicekfit
 Title: Extended Vasicek Credit Loss Model with Macroeconomic Factors
-Version: 0.1.0.9000
+Version: 0.2.0
 Authors@R: person("Dmitriy", "Mayorov", email = "cran@dimview.org",
                   role = c("aut", "cre"))
 Description: Fits the extended Vasicek single-factor credit loss model where
